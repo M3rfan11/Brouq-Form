@@ -46,14 +46,49 @@ A complete solution for managing match attendance with QR code-based verificatio
 
    **Alternative:** Edit `emailService.js` directly and update the `emailConfig` object.
 
-3. **Configure admin credentials (optional):**
+3. **Configure admin credentials:**
 
-   You can set admin username and password in `.env` file:
+   **Option 1: Using .env file (Local Development)**
+   
+   Copy `.env.example` to `.env` and update the values:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Then edit `.env` with your credentials:
    ```env
    ADMIN_USERNAME=admin
    ADMIN_PASSWORD=your-secure-password
    SESSION_SECRET=your-secret-key-for-sessions
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-password
+   QR_EXPIRY_DAYS=7
    ```
+
+   **Option 2: Using GitHub Secrets (For CI/CD and Deployment)**
+   
+   To use GitHub Secrets for your credentials:
+   
+   1. Go to your GitHub repository: https://github.com/M3rfan11/Brouq-Form
+   2. Click on **Settings** → **Secrets and variables** → **Actions**
+   3. Click **New repository secret** and add the following secrets:
+   
+   | Secret Name | Description | Example |
+   |------------|-------------|---------|
+   | `ADMIN_USERNAME` | Admin login username | `admin` |
+   | `ADMIN_PASSWORD` | Admin login password | `your-secure-password` |
+   | `SESSION_SECRET` | Session encryption key | See "Generating Session Secret" below |
+   | `SMTP_HOST` | Email server host | `smtp.gmail.com` |
+   | `SMTP_PORT` | Email server port | `587` |
+   | `SMTP_USER` | Email account | `your-email@gmail.com` |
+   | `SMTP_PASS` | Email app password | `your-app-password` |
+   | `PORT` | Server port (optional) | `3000` |
+   | `HTTPS_PORT` | HTTPS port (optional) | `3443` |
+   | `QR_EXPIRY_DAYS` | QR code expiry in days (optional) | `7` |
+   
+   4. The GitHub Actions workflow (`.github/workflows/deploy.yml`) will automatically use these secrets during deployment.
 
    **Default credentials** (change these in production!):
    - Username: `admin`
@@ -171,16 +206,75 @@ The application uses SQLite database (`attendance.db`) which is automatically cr
 - Make sure the application has write permissions
 - Check if `attendance.db` file exists and is accessible
 
+## Generating Session Secret
+
+A session secret is a random string used to encrypt session data. Here are several ways to generate one:
+
+### Method 1: Using the included script (Recommended)
+```bash
+node generate-secret.js
+```
+
+### Method 2: Using OpenSSL
+```bash
+openssl rand -base64 32
+```
+
+### Method 3: Using Node.js
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+### Method 4: Using Python
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+**Important:** 
+- Use a long, random string (at least 32 characters)
+- Never share or commit the secret to git
+- Use different secrets for development and production
+- Store it securely in `.env` file or GitHub Secrets
+
+## GitHub Secrets Setup
+
+This project uses GitHub Secrets for secure credential management in CI/CD pipelines.
+
+### Setting Up GitHub Secrets
+
+1. Navigate to your repository on GitHub
+2. Go to **Settings** → **Secrets and variables** → **Actions**
+3. Click **New repository secret** for each secret:
+
+**Required Secrets:**
+- `ADMIN_USERNAME` - Admin login username
+- `ADMIN_PASSWORD` - Admin login password (use a strong password!)
+- `SESSION_SECRET` - Random string for session encryption (generate with: `openssl rand -base64 32`)
+- `SMTP_HOST` - Email server hostname
+- `SMTP_PORT` - Email server port
+- `SMTP_USER` - Email account username
+- `SMTP_PASS` - Email account app password
+
+**Optional Secrets:**
+- `PORT` - Server port (default: 3000)
+- `HTTPS_PORT` - HTTPS port (default: 3443)
+- `QR_EXPIRY_DAYS` - QR code expiry in days (default: 7)
+
+### Using Secrets in GitHub Actions
+
+The workflow files (`.github/workflows/`) automatically use these secrets. The `deploy.yml` workflow creates a `.env` file from secrets during deployment.
+
 ## Production Deployment
 
 For production deployment:
 
-1. Use a production database (PostgreSQL, MySQL)
-2. Add authentication for admin endpoints
+1. **Use GitHub Secrets** for all sensitive credentials (see above)
+2. Use a production database (PostgreSQL, MySQL) instead of SQLite
 3. Use HTTPS (required for camera access)
 4. Set up proper email service (SendGrid, AWS SES, etc.)
-5. Add environment variables for sensitive data
+5. Never commit `.env` files or credentials to the repository
 6. Set up proper logging and monitoring
+7. Use environment variables for all configuration
 
 ## License
 
