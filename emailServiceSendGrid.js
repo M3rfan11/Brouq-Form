@@ -34,7 +34,15 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
         email: fromEmail,
         name: 'Match Attendance'
       },
+      replyTo: fromEmail, // Add reply-to for better deliverability
       subject: 'Your Match Attendance QR Code',
+      // Add categories for better tracking and deliverability
+      categories: ['match-attendance', 'qr-code'],
+      // Add custom headers to improve deliverability
+      customArgs: {
+        source: 'match-registration',
+        type: 'qr-code'
+      },
       html: `
         <!DOCTYPE html>
         <html>
