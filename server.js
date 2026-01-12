@@ -157,33 +157,35 @@ app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    req.session.authenticated = true;
-    req.session.username = username;
-    
-    // Log session info for debugging
-    console.log('Login successful, setting session:', {
-      sessionId: req.sessionID,
-      authenticated: req.session.authenticated,
-      username: req.session.username
-    });
-    
-    // Save session explicitly and set cookie headers
-    req.session.save((err) => {
+    // Regenerate session to ensure clean state
+    req.session.regenerate((err) => {
       if (err) {
-        console.error('Session save error:', err);
-        return res.status(500).json({ error: 'Failed to save session' });
+        console.error('Session regenerate error:', err);
+        return res.status(500).json({ error: 'Failed to regenerate session' });
       }
       
-      // Ensure cookie is set
-      res.cookie('match-attendance.sid', req.sessionID, {
-        secure: true,
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'lax'
+      // Set session data
+      req.session.authenticated = true;
+      req.session.username = username;
+      
+      // Log session info for debugging
+      console.log('Login successful, setting session:', {
+        sessionId: req.sessionID,
+        authenticated: req.session.authenticated,
+        username: req.session.username
       });
       
-      console.log('Session saved, cookie set:', req.sessionID);
-      res.json({ success: true, message: 'Login successful', sessionId: req.sessionID });
+      // Save session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ error: 'Failed to save session' });
+        }
+        
+        console.log('Session saved successfully:', req.sessionID);
+        console.log('Session data:', req.session);
+        res.json({ success: true, message: 'Login successful', sessionId: req.sessionID });
+      });
     });
   } else {
     res.status(401).json({ error: 'Invalid username or password' });
