@@ -56,6 +56,36 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Email configuration test endpoint (for debugging)
+app.get('/api/test-email', async (req, res) => {
+  const { transporter } = require('./emailService');
+  try {
+    await transporter.verify();
+    res.json({ 
+      success: true, 
+      message: 'Email configuration is correct',
+      config: {
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: process.env.SMTP_PORT || 587,
+        user: process.env.SMTP_USER ? '***configured***' : 'NOT SET',
+        pass: process.env.SMTP_PASS ? '***configured***' : 'NOT SET'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      config: {
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: process.env.SMTP_PORT || 587,
+        user: process.env.SMTP_USER ? '***configured***' : 'NOT SET',
+        pass: process.env.SMTP_PASS ? '***configured***' : 'NOT SET'
+      },
+      hint: 'Check your SMTP credentials in environment variables'
+    });
+  }
+});
+
 // Login endpoint
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;

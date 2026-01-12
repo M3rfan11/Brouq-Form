@@ -144,14 +144,20 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
   }
 }
 
-// Verify email configuration
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log('Email configuration error:', error);
-    console.log('Please configure your email settings in .env file or emailService.js');
-  } else {
-    console.log('Email server is ready to send messages');
-  }
-});
+// Verify email configuration (only in development, skip in production to avoid startup delays)
+if (process.env.NODE_ENV !== 'production') {
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.log('⚠️  Email configuration warning:', error.message);
+      console.log('   Email will be verified on first send attempt');
+      console.log('   Make sure SMTP credentials are set in environment variables');
+    } else {
+      console.log('✅ Email server is ready to send messages');
+    }
+  });
+} else {
+  // In production, skip verification to avoid startup timeout
+  console.log('📧 Email service configured (will verify on first send)');
+}
 
 module.exports = { sendEmailWithQR, transporter };
