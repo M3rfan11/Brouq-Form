@@ -45,6 +45,12 @@ console.log(`   Secure: ${emailConfig.secure}`);
 console.log(`   User: ${emailConfig.auth.user ? emailConfig.auth.user.substring(0, 3) + '***' : 'NOT SET'}`);
 console.log(`   Password: ${emailConfig.auth.pass ? '***SET***' : 'NOT SET'}`);
 console.log(`   Connection Timeout: ${emailConfig.connectionTimeout}ms`);
+if (emailConfig.host === 'smtp.sendgrid.net') {
+  console.log(`   Provider: SendGrid`);
+  console.log(`   Sender Email: ${process.env.SENDER_EMAIL || emailConfig.auth.user || 'NOT SET'}`);
+} else {
+  console.log(`   Provider: Gmail`);
+}
 
 /**
  * Send email with QR code attachment
