@@ -21,7 +21,8 @@ const emailConfig = {
   greetingTimeout: 30000,
   socketTimeout: 30000, // 30 seconds for socket operations
   // Retry configuration
-  pool: true, // Use connection pooling
+  // Disable pooling for SendGrid (can cause connection issues)
+  pool: process.env.SMTP_HOST === 'smtp.sendgrid.net' ? false : true,
   maxConnections: 1,
   maxMessages: 3,
   // Enable debug in development
@@ -29,9 +30,12 @@ const emailConfig = {
   logger: process.env.NODE_ENV !== 'production',
   // TLS options for better compatibility with Railway
   tls: {
-    rejectUnauthorized: false, // Allow self-signed certificates if needed
+    rejectUnauthorized: process.env.SMTP_HOST === 'smtp.sendgrid.net' ? true : false, // SendGrid uses valid certs
     minVersion: 'TLSv1.2'
-  }
+  },
+  // Additional options
+  requireTLS: true,
+  ignoreTLS: false
 };
 
 // Create transporter
@@ -72,11 +76,14 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
   const emailPromise = (async () => {
     try {
       console.log(`📧 Attempting to send email to ${to} via ${emailConfig.host}:${emailConfig.port}...`);
-      // For SendGrid, use the verified sender email, not the API key
+      // For SendGrid, use the verified sender email (must be verified in SendGrid)
       // For Gmail, use the auth user
       const fromEmail = emailConfig.host === 'smtp.sendgrid.net' 
-        ? process.env.SENDER_EMAIL || emailConfig.auth.user 
+        ? (process.env.SENDER_EMAIL || 'merfan3746@gmail.com') // Use verified email
         : emailConfig.auth.user;
+      
+      console.log(`   From email: ${fromEmail}`);
+      console.log(`   Auth user: ${emailConfig.auth.user ? emailConfig.auth.user.substring(0, 3) + '***' : 'NOT SET'}`);
       
       const mailOptions = {
         from: `"Match Attendance" <${fromEmail}>`,
@@ -216,9 +223,11 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
     }
   })();
 
-  // Add 15 second timeout to prevent hanging connections
+  // Add timeout to prevent hanging connections
+  // Longer timeout for SendGrid (35 seconds) since connection can be slow on Railway
+  const timeoutDuration = emailConfig.host === 'smtp.sendgrid.net' ? 35000 : 15000;
   const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Email sending timeout after 15 seconds')), 15000);
+    setTimeout(() => reject(new Error(`Email sending timeout after ${timeoutDuration/1000} seconds`)), timeoutDuration);
   });
 
   return Promise.race([emailPromise, timeoutPromise]);
