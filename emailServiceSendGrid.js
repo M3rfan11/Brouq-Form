@@ -149,6 +149,21 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
     if (error.response) {
       console.error(`   Status Code: ${error.response.statusCode}`);
       console.error(`   Body: ${JSON.stringify(error.response.body)}`);
+      
+      // Check for sender verification error
+      if (error.response.body && error.response.body.errors) {
+        const errors = error.response.body.errors;
+        const senderError = errors.find(e => e.field === 'from' || e.message.includes('verified Sender Identity'));
+        if (senderError) {
+          console.error('   💡 SOLUTION:');
+          console.error('      1. Go to SendGrid Dashboard → Settings → Sender Authentication');
+          console.error('      2. Click "Verify a Single Sender"');
+          console.error(`      3. Use email: ${fromEmail}`);
+          console.error('      4. Fill in all required fields');
+          console.error('      5. Check your email and click the verification link');
+          console.error('      6. Wait for approval (usually instant)');
+        }
+      }
     }
     throw error;
   }
