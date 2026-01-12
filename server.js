@@ -42,15 +42,18 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 // Session configuration
 // Use MemoryStore for Railway (simple, no external dependencies)
+// Session configuration optimized for Cloud Run
 app.use(session({
   secret: process.env.SESSION_SECRET || 'match-attendance-secret-key-change-in-production',
-  resave: false,
+  resave: true, // Changed to true for Cloud Run (multiple instances)
   saveUninitialized: false,
+  name: 'match-attendance.sid', // Custom session name
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
+    secure: true, // Always true for Cloud Run (HTTPS only)
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax' // Allow cookies to be sent with cross-site requests
+    sameSite: 'lax', // Allow cookies to be sent with cross-site requests
+    domain: undefined // Let Cloud Run handle domain
   }
 }));
 
