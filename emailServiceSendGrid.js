@@ -35,13 +35,38 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
         name: 'Match Attendance'
       },
       replyTo: fromEmail, // Add reply-to for better deliverability
-      subject: 'Your Match Attendance QR Code',
+      subject: 'Your Match Attendance QR Code - Please Confirm',
+      // Add plain text version for better deliverability
+      text: `Hello ${name},
+
+Thank you for registering for the match! Your attendance has been confirmed.
+
+Your QR Code: ${qrCode}
+
+Please present this QR code at the venue entrance. You can scan the QR code image in this email OR copy the code above for manual entry.
+
+Important Instructions:
+- This QR code is unique to you and can only be used once
+- Please arrive at least 30 minutes before the match starts
+- Have your QR code ready on your phone or printed
+- Do not share your QR code with others
+${expiresAt ? `- This QR code expires on: ${new Date(expiresAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}` : ''}
+
+We look forward to seeing you at the match!
+
+This is an automated message. Please do not reply to this email.`,
       // Add categories for better tracking and deliverability
       categories: ['match-attendance', 'qr-code'],
       // Add custom headers to improve deliverability
       customArgs: {
         source: 'match-registration',
         type: 'qr-code'
+      },
+      // Add headers to improve deliverability
+      headers: {
+        'X-Entity-Ref-ID': qrCode, // Unique identifier for tracking
+        'List-Unsubscribe': `<mailto:${fromEmail}?subject=unsubscribe>`, // Unsubscribe header
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
       },
       html: `
         <!DOCTYPE html>
@@ -105,7 +130,12 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
             <div class="qr-container">
               <h3>Your QR Code</h3>
               <p>Please present this QR code at the venue entrance:</p>
-              <img src="cid:qrcode" alt="QR Code" class="qr-code" />
+              <div style="text-align: center; margin: 20px 0;">
+                <img src="cid:qrcode" alt="QR Code" class="qr-code" style="max-width: 300px; height: auto; display: block; margin: 0 auto; border: 2px solid #ddd; padding: 10px; background: white;" />
+              </div>
+              <p style="text-align: center; color: #666; font-size: 12px; margin-top: 10px;">
+                If the QR code image doesn't appear above, please use the manual entry code below.
+              </p>
               
               <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border: 2px dashed #667eea;">
                 <p style="font-size: 11px; color: #666; margin: 0 0 8px 0; font-weight: 600;">For Manual Entry (if camera doesn't work):</p>
