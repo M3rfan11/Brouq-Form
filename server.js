@@ -64,7 +64,26 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Email configuration diagnostic endpoint (for debugging)
+app.get('/api/email-config', requireAuth, (req, res) => {
+  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const smtpPort = process.env.SMTP_PORT || 587;
+  const smtpUser = process.env.SMTP_USER || '';
+  const smtpPass = process.env.SMTP_PASS || '';
+  
+  res.json({
+    configured: !!(smtpUser && smtpPass),
+    host: smtpHost,
+    port: parseInt(smtpPort),
+    user: smtpUser ? smtpUser.substring(0, 3) + '***' : 'NOT SET',
+    password_set: !!smtpPass,
+    secure: parseInt(smtpPort) === 465,
+    note: 'This endpoint shows configuration without exposing sensitive data'
   });
 });
 

@@ -36,6 +36,15 @@ const emailConfig = {
 // Create transporter
 const transporter = nodemailer.createTransport(emailConfig);
 
+// Log configuration (without exposing password)
+console.log('📧 Email Configuration:');
+console.log(`   Host: ${emailConfig.host}`);
+console.log(`   Port: ${emailConfig.port}`);
+console.log(`   Secure: ${emailConfig.secure}`);
+console.log(`   User: ${emailConfig.auth.user ? emailConfig.auth.user.substring(0, 3) + '***' : 'NOT SET'}`);
+console.log(`   Password: ${emailConfig.auth.pass ? '***SET***' : 'NOT SET'}`);
+console.log(`   Connection Timeout: ${emailConfig.connectionTimeout}ms`);
+
 /**
  * Send email with QR code attachment
  * @param {string} to - Recipient email
@@ -45,11 +54,19 @@ const transporter = nodemailer.createTransport(emailConfig);
  * @param {string} expiresAt - Expiry date ISO string
  */
 async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
+  // Validate configuration before attempting to send
+  if (!emailConfig.auth.user || !emailConfig.auth.pass) {
+    const error = new Error('SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
+    console.error('❌ Email sending failed:', error.message);
+    throw error;
+  }
+
   // Wrap in timeout to prevent hanging connections
   const emailPromise = (async () => {
     try {
+      console.log(`📧 Attempting to send email to ${to} via ${emailConfig.host}:${emailConfig.port}...`);
       const mailOptions = {
-      from: `"Match Attendance" <${emailConfig.auth.user}>`,
+        from: `"Match Attendance" <${emailConfig.auth.user}>`,
       to: to,
       subject: 'Your Match Attendance QR Code',
       html: `
@@ -158,10 +175,20 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
     };
 
       const info = await transporter.sendMail(mailOptions);
-      console.log('Email sent:', info.messageId);
+      console.log(`✅ Email sent successfully: ${info.messageId}`);
       return info;
     } catch (error) {
-      console.error('Error sending email:', error);
+      console.error('❌ Error sending email:', error.message);
+      console.error(`   Code: ${error.code || 'N/A'}`);
+      console.error(`   Command: ${error.command || 'N/A'}`);
+      if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
+        console.error('   💡 Troubleshooting:');
+        console.error('      - Check if SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS are set correctly');
+        console.error('      - Verify Gmail App Password is correct (16 characters, no spaces)');
+        console.error('      - Try using port 465 instead of 587 (set SMTP_PORT=465)');
+        console.error('      - Gmail may be blocking connections from Railway IPs');
+        console.error('      - Consider using SendGrid or another email service for cloud deployments');
+      }
       throw error;
     }
   })();
