@@ -1,0 +1,50 @@
+name: Deploy Application
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Create .env file from secrets
+      run: |
+        cat > .env << EOF
+        ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+        ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+        SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+        SMTP_HOST=${{ secrets.SMTP_HOST }}
+        SMTP_PORT=${{ secrets.SMTP_PORT }}
+        SMTP_USER=${{ secrets.SMTP_USER }}
+        SMTP_PASS=${{ secrets.SMTP_PASS }}
+        PORT=${{ secrets.PORT || '3000' }}
+        HTTPS_PORT=${{ secrets.HTTPS_PORT || '3443' }}
+        QR_EXPIRY_DAYS=${{ secrets.QR_EXPIRY_DAYS || '7' }}
+        EOF
+    
+    - name: Run tests (if you have any)
+      run: echo "Add your tests here"
+      # run: npm test
+    
+    - name: Build application
+      run: echo "Application ready for deployment"
+      # Add your deployment steps here
+      # For example:
+      # - Deploy to cloud platform
+      # - Run database migrations
+      # - Restart services
