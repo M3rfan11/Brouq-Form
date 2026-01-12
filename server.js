@@ -16,6 +16,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 
+// Set NODE_ENV if not set (for Railway)
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'production';
+}
+
 // Admin credentials (in production, use environment variables)
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
@@ -188,26 +193,25 @@ app.post('/api/submit', async (req, res) => {
     // Generate QR code image
     const qrCodeBuffer = await generateQRCode(qr_code_data);
 
-    // Send email with QR code (with error handling)
-    let emailSent = false;
-    try {
-      await sendEmailWithQR(normalizedEmail, name, qrCodeBuffer, qr_code, expires_at_iso);
-      emailSent = true;
-      console.log(`✅ Email sent successfully to ${normalizedEmail}`);
-    } catch (emailError) {
-      console.error('❌ Email sending failed:', emailError.message);
-      // Log but don't fail the request - QR code is saved, user can still use it
-      // In production, consider using a queue service for emails
-    }
+    // Send email asynchronously (don't wait for it - non-blocking)
+    // This prevents email timeouts from crashing the server
+    sendEmailWithQR(normalizedEmail, name, qrCodeBuffer, qr_code, expires_at_iso)
+      .then(() => {
+        console.log(`✅ Email sent successfully to ${normalizedEmail}`);
+      })
+      .catch((emailError) => {
+        console.error('❌ Email sending failed:', emailError.message);
+        console.error('   QR code saved, but email not sent. User can still use QR code:', qr_code);
+        // In production, consider using a queue service (Bull, RabbitMQ) for emails
+      });
 
+    // Return success immediately - don't wait for email
     res.json({ 
       success: true, 
-      message: emailSent 
-        ? 'Form submitted successfully! Check your email for the QR code.'
-        : 'Registration successful! However, email could not be sent. Your QR code is: ' + qr_code,
+      message: 'Form submitted successfully! Check your email for the QR code.',
       attendee_id: attendee.id,
-      qr_code: qr_code, // Always return QR code in case email fails
-      email_sent: emailSent
+      qr_code: qr_code, // Always return QR code
+      note: 'If you don\'t receive an email, you can still use the QR code above'
     });
 
   } catch (error) {
@@ -402,20 +406,20 @@ try {
 }
 
 // Start HTTP server immediately (don't wait for anything)
-// In production (cloud platforms), use PORT from environment
-// In local development, use PORT 3000
+// Railway sets PORT automatically - use it
 const httpServer = http.createServer(app);
 const serverPort = process.env.PORT || PORT;
 
-// Start server immediately - this is critical for Render/Railway health checks
+// Start server immediately - CRITICAL for Railway health checks
+// Railway will kill the process if it doesn't respond within ~30 seconds
 httpServer.listen(serverPort, '0.0.0.0', () => {
   console.log(`✅ Server running on port ${serverPort}`);
+  console.log(`🚀 Application ready to accept requests`);
+  console.log(`📧 Email service: ${process.env.SMTP_USER ? 'Configured' : 'Not configured'}`);
   if (process.env.NODE_ENV !== 'production') {
     console.log(`HTTP Server: http://localhost:${serverPort}`);
     console.log(`Access from same device: http://localhost:${serverPort}`);
   }
-  // Signal that server is ready (for health checks)
-  console.log('🚀 Application ready to accept requests');
 });
 
 // Start HTTPS server (for mobile access in local development)

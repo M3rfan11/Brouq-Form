@@ -45,7 +45,9 @@ const transporter = nodemailer.createTransport(emailConfig);
  * @param {string} expiresAt - Expiry date ISO string
  */
 async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
-  try {
+  // Add timeout wrapper to prevent hanging
+  const emailPromise = (async () => {
+    try {
     const mailOptions = {
       from: `"Match Attendance" <${emailConfig.auth.user}>`,
       to: to,
