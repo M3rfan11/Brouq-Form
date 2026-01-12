@@ -105,7 +105,7 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
             <div class="qr-container">
               <h3>Your QR Code</h3>
               <p>Please present this QR code at the venue entrance:</p>
-              <img src="data:image/png;base64,${qrCodeBase64}" alt="QR Code" class="qr-code" />
+              <img src="cid:qrcode" alt="QR Code" class="qr-code" />
               
               <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border: 2px dashed #667eea;">
                 <p style="font-size: 11px; color: #666; margin: 0 0 8px 0; font-weight: 600;">For Manual Entry (if camera doesn't work):</p>
@@ -144,7 +144,8 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
           content: qrCodeBase64,
           filename: 'qr-code.png',
           type: 'image/png',
-          disposition: 'attachment'
+          disposition: 'inline', // Changed to inline so it displays in email
+          contentId: 'qrcode' // Content-ID for embedding in HTML (cid:qrcode)
         }
       ]
     };
