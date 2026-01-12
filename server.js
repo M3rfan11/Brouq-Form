@@ -177,8 +177,15 @@ app.post('/api/logout', (req, res) => {
 
 // Check authentication status
 app.get('/api/auth/status', (req, res) => {
+  // Add cache control headers to prevent caching
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  
+  const isAuthenticated = req.session && req.session.authenticated === true;
   res.json({ 
-    authenticated: req.session && req.session.authenticated || false 
+    authenticated: isAuthenticated,
+    username: isAuthenticated ? req.session.username : null
   });
 });
 
