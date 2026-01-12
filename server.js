@@ -49,7 +49,8 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax' // Allow cookies to be sent with cross-site requests
   }
 }));
 
@@ -144,7 +145,14 @@ app.post('/api/login', (req, res) => {
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     req.session.authenticated = true;
     req.session.username = username;
-    res.json({ success: true, message: 'Login successful' });
+    // Save session explicitly
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ error: 'Failed to save session' });
+      }
+      res.json({ success: true, message: 'Login successful' });
+    });
   } else {
     res.status(401).json({ error: 'Invalid username or password' });
   }
