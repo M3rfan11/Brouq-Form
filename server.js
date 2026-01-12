@@ -55,7 +55,11 @@ app.use(session({
 }));
 
 // Middleware
-app.use(cors());
+// CORS configuration for Cloud Run - allow credentials (cookies)
+app.use(cors({
+  origin: true, // Allow all origins (Cloud Run handles this)
+  credentials: true // Allow cookies to be sent
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
