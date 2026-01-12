@@ -176,6 +176,13 @@ This is an automated message. Please do not reply to this email.`,
           type: 'image/png',
           disposition: 'inline', // Changed to inline so it displays in email
           content_id: 'qrcode' // Content-ID for embedding in HTML (cid:qrcode) - SendGrid uses snake_case
+        },
+        // Also attach as regular attachment for email clients that don't support inline images (like Gmail mobile)
+        {
+          content: qrCodeBase64,
+          filename: 'qr-code-attachment.png',
+          type: 'image/png',
+          disposition: 'attachment' // Regular attachment as fallback
         }
       ]
     };
