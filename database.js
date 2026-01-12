@@ -4,12 +4,21 @@ const path = require('path');
 const dbPath = path.join(__dirname, 'attendance.db');
 
 // Create and initialize database
+// Use a timeout to prevent hanging on cloud platforms
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
+    // Don't exit - let the app continue, database will be created on first use
   } else {
     console.log('Connected to SQLite database');
-    initializeDatabase();
+    // Initialize asynchronously to not block startup
+    setImmediate(() => {
+      try {
+        initializeDatabase();
+      } catch (error) {
+        console.error('Database initialization error:', error.message);
+      }
+    });
   }
 });
 

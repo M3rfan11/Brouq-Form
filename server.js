@@ -35,9 +35,9 @@ app.use(session({
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
 
 // Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Authentication middleware
@@ -51,9 +51,18 @@ const requireAuth = (req, res, next) => {
 
 // Routes
 
-// Health check
+// Health check endpoint (for Render/Railway health checks)
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// Root health check (for platform health checks)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Email configuration test endpoint (for debugging)
