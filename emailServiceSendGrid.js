@@ -18,7 +18,7 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
   }
 
   // Use verified sender email
-  const fromEmail = process.env.SENDER_EMAIL || 'merfan3746@gmail.com';
+  const fromEmail = process.env.SENDER_EMAIL || 'm.elshabouri@gmail.com';
   
   console.log(`📧 Attempting to send email to ${to} via SendGrid REST API...`);
   console.log(`   From: ${fromEmail}`);
@@ -172,7 +172,7 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
 // Log configuration
 console.log('📧 SendGrid REST API Configuration:');
 console.log(`   API Key: ${sendGridApiKey ? '***SET***' : 'NOT SET'}`);
-console.log(`   Sender Email: ${process.env.SENDER_EMAIL || 'merfan3746@gmail.com'}`);
+console.log(`   Sender Email: ${process.env.SENDER_EMAIL || 'm.elshabouri@gmail.com'} (verified)`);
 if (!sendGridApiKey) {
   console.log('   ⚠️  Warning: SendGrid API key not set');
 }

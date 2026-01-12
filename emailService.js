@@ -52,11 +52,11 @@ console.log(`   Connection Timeout: ${emailConfig.connectionTimeout}ms`);
 if (emailConfig.host === 'smtp.sendgrid.net') {
   console.log(`   Provider: SendGrid`);
   // For SendGrid, sender email must be verified email, not "apikey"
-  const senderEmail = process.env.SENDER_EMAIL || 'merfan3746@gmail.com';
-  console.log(`   Sender Email: ${senderEmail} (must be verified in SendGrid)`);
+  const senderEmail = process.env.SENDER_EMAIL || 'm.elshabouri@gmail.com';
+  console.log(`   Sender Email: ${senderEmail} (verified)`);
   if (!process.env.SENDER_EMAIL) {
-    console.log(`   ⚠️  SENDER_EMAIL not set, using default: merfan3746@gmail.com`);
-    console.log(`   💡 Add SENDER_EMAIL=merfan3746@gmail.com to Railway variables`);
+    console.log(`   ⚠️  SENDER_EMAIL not set, using default: m.elshabouri@gmail.com`);
+    console.log(`   💡 Add SENDER_EMAIL=m.elshabouri@gmail.com to Railway variables (optional)`);
   }
 } else {
   console.log(`   Provider: Gmail`);
