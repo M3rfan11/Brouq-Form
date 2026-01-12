@@ -75,20 +75,33 @@ app.use(require('cookie-parser')()); // Parse cookies for JWT tokens
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Authentication middleware
+// Authentication middleware - Check JWT token first, then fall back to session
 const requireAuth = (req, res, next) => {
-  console.log('requireAuth check:', {
-    sessionId: req.sessionID,
-    hasSession: !!req.session,
-    authenticated: req.session && req.session.authenticated
-  });
+  // Try JWT token first (from Authorization header or cookie)
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const cookieToken = req.cookies && req.cookies.authToken;
   
+  if (token || cookieToken) {
+    try {
+      const jwtToken = token || cookieToken;
+      const decoded = jwt.verify(jwtToken, JWT_SECRET);
+      if (decoded.authenticated && decoded.username) {
+        req.user = { username: decoded.username, authenticated: true };
+        return next();
+      }
+    } catch (err) {
+      // JWT invalid, try session
+    }
+  }
+  
+  // Fall back to session (for backward compatibility)
   if (req.session && req.session.authenticated === true) {
     return next();
-  } else {
-    console.log('Auth failed, returning 401');
-    return res.status(401).json({ error: 'Authentication required' });
   }
+  
+  console.log('Auth failed, returning 401');
+  return res.status(401).json({ error: 'Authentication required' });
 };
 
 // Routes
@@ -157,40 +170,40 @@ app.get('/api/test-email', async (req, res) => {
   }
 });
 
-// Login endpoint
+// Login endpoint - Use JWT tokens (works better on Cloud Run)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    // Regenerate session to ensure clean state
-    req.session.regenerate((err) => {
-      if (err) {
-        console.error('Session regenerate error:', err);
-        return res.status(500).json({ error: 'Failed to regenerate session' });
-      }
-      
-      // Set session data
-      req.session.authenticated = true;
-      req.session.username = username;
-      
-      // Log session info for debugging
-      console.log('Login successful, setting session:', {
-        sessionId: req.sessionID,
-        authenticated: req.session.authenticated,
-        username: req.session.username
-      });
-      
-      // Save session explicitly
-      req.session.save((err) => {
-        if (err) {
-          console.error('Session save error:', err);
-          return res.status(500).json({ error: 'Failed to save session' });
-        }
-        
-        console.log('Session saved successfully:', req.sessionID);
-        console.log('Session data:', req.session);
-        res.json({ success: true, message: 'Login successful', sessionId: req.sessionID });
-      });
+    // Create JWT token (stateless, works on Cloud Run)
+    const token = jwt.sign(
+      { 
+        authenticated: true, 
+        username: username,
+        iat: Math.floor(Date.now() / 1000)
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    // Also set session for backward compatibility
+    req.session.authenticated = true;
+    req.session.username = username;
+    
+    console.log('Login successful, created JWT token for:', username);
+    
+    // Set token as HTTP-only cookie
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
+    res.json({ 
+      success: true, 
+      message: 'Login successful',
+      token: token // Also return in response for client-side storage
     });
   } else {
     res.status(401).json({ error: 'Invalid username or password' });
@@ -207,37 +220,41 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-// Check authentication status
+// Check authentication status - Check JWT first, then session
 app.get('/api/auth/status', (req, res) => {
   // Add cache control headers to prevent caching
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   
-  // Log session info for debugging
-  console.log('Auth status check:', {
-    sessionId: req.sessionID,
-    hasSession: !!req.session,
-    sessionKeys: req.session ? Object.keys(req.session) : [],
-    authenticated: req.session && req.session.authenticated,
-    authenticatedValue: req.session ? req.session.authenticated : 'no session',
-    cookies: req.headers.cookie,
-    sessionStore: 'MemoryStore'
-  });
+  // Try JWT token first
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  const cookieToken = req.cookies && req.cookies.authToken;
   
-  // Check if session exists and has authenticated property
-  const isAuthenticated = req.session && req.session.authenticated === true;
-  
-  // If session exists but authenticated is not set, log warning
-  if (req.session && req.session.authenticated !== true && req.session.authenticated !== false) {
-    console.warn('Session exists but authenticated property is:', req.session.authenticated);
+  if (token || cookieToken) {
+    try {
+      const jwtToken = token || cookieToken;
+      const decoded = jwt.verify(jwtToken, JWT_SECRET);
+      if (decoded.authenticated && decoded.username) {
+        return res.json({
+          authenticated: true,
+          username: decoded.username,
+          method: 'JWT'
+        });
+      }
+    } catch (err) {
+      // JWT invalid, try session
+    }
   }
   
+  // Fall back to session
+  const isAuthenticated = req.session && req.session.authenticated === true;
   res.json({ 
     authenticated: isAuthenticated,
     username: isAuthenticated ? req.session.username : null,
-    sessionId: req.sessionID,
-    sessionKeys: req.session ? Object.keys(req.session) : []
+    method: 'session',
+    sessionId: req.sessionID
   });
 });
 
