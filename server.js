@@ -69,6 +69,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(require('cookie-parser')()); // Parse cookies for JWT tokens
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
