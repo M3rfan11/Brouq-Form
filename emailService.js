@@ -66,8 +66,14 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
   const emailPromise = (async () => {
     try {
       console.log(`📧 Attempting to send email to ${to} via ${emailConfig.host}:${emailConfig.port}...`);
+      // For SendGrid, use the verified sender email, not the API key
+      // For Gmail, use the auth user
+      const fromEmail = emailConfig.host === 'smtp.sendgrid.net' 
+        ? process.env.SENDER_EMAIL || emailConfig.auth.user 
+        : emailConfig.auth.user;
+      
       const mailOptions = {
-        from: `"Match Attendance" <${emailConfig.auth.user}>`,
+        from: `"Match Attendance" <${fromEmail}>`,
       to: to,
       subject: 'Your Match Attendance QR Code',
       html: `
