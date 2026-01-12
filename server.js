@@ -8,7 +8,22 @@ const cors = require('cors');
 const path = require('path');
 const session = require('express-session');
 const { dbHelpers } = require('./database');
-const { sendEmailWithQR } = require('./emailService');
+// Use SendGrid REST API if SMTP_HOST is sendgrid (more reliable than SMTP)
+let sendEmailWithQR;
+if (process.env.SMTP_HOST === 'smtp.sendgrid.net') {
+  try {
+    const sendGridService = require('./emailServiceSendGrid');
+    sendEmailWithQR = sendGridService.sendEmailWithQR;
+    console.log('📧 Using SendGrid REST API (more reliable than SMTP for cloud platforms)');
+  } catch (error) {
+    console.log('⚠️  SendGrid REST API not available, falling back to SMTP:', error.message);
+    const emailService = require('./emailService');
+    sendEmailWithQR = emailService.sendEmailWithQR;
+  }
+} else {
+  const emailService = require('./emailService');
+  sendEmailWithQR = emailService.sendEmailWithQR;
+}
 const { generateQRCode } = require('./qrService');
 const { v4: uuidv4 } = require('uuid');
 
