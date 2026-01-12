@@ -194,13 +194,23 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
       console.error('❌ Error sending email:', error.message);
       console.error(`   Code: ${error.code || 'N/A'}`);
       console.error(`   Command: ${error.command || 'N/A'}`);
+      console.error(`   Provider: ${emailConfig.host === 'smtp.sendgrid.net' ? 'SendGrid' : 'Gmail'}`);
+      
       if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
-        console.error('   💡 Troubleshooting:');
-        console.error('      - Check if SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS are set correctly');
-        console.error('      - Verify Gmail App Password is correct (16 characters, no spaces)');
-        console.error('      - Try using port 465 instead of 587 (set SMTP_PORT=465)');
-        console.error('      - Gmail may be blocking connections from Railway IPs');
-        console.error('      - Consider using SendGrid or another email service for cloud deployments');
+        if (emailConfig.host === 'smtp.sendgrid.net') {
+          console.error('   💡 SendGrid Troubleshooting:');
+          console.error('      - Verify SMTP_USER is exactly "apikey" (not your email)');
+          console.error('      - Verify SMTP_PASS is your SendGrid API key (starts with SG.)');
+          console.error('      - Check SendGrid Dashboard → Activity to see if emails are being sent');
+          console.error('      - Make sure sender email is verified in SendGrid');
+          console.error('      - Verify SMTP_HOST is "smtp.sendgrid.net"');
+        } else {
+          console.error('   💡 Gmail Troubleshooting:');
+          console.error('      - Gmail blocks connections from Railway IPs (this is expected)');
+          console.error('      - Switch to SendGrid: See SENDGRID_SETUP.md for instructions');
+          console.error('      - Or try port 465 instead of 587 (set SMTP_PORT=465)');
+          console.error('      - Verify Gmail App Password is correct (16 characters, no spaces)');
+        }
       }
       throw error;
     }
