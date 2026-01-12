@@ -90,7 +90,7 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
       
       if (emailConfig.host === 'smtp.sendgrid.net' && fromEmail === 'apikey') {
         console.error('   ❌ ERROR: Sender email cannot be "apikey" for SendGrid!');
-        console.error('   💡 Set SENDER_EMAIL=merfan3746@gmail.com in Railway variables');
+        console.error('   💡 Set SENDER_EMAIL=m.elshabouri@gmail.com in Railway variables');
         throw new Error('Invalid sender email for SendGrid. Set SENDER_EMAIL environment variable to your verified email.');
       }
       
