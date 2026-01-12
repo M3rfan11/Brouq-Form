@@ -25,26 +25,47 @@ A complete solution for managing match attendance with QR code-based verificatio
    npm install
    ```
 
-2. **Configure email settings:**
+2. **Configure email settings (Gmail):**
 
-   Create a `.env` file in the root directory (optional, or edit `emailService.js` directly):
+   The application is configured to use **Gmail** by default. Create a `.env` file in the root directory:
    ```env
    SMTP_HOST=smtp.gmail.com
    SMTP_PORT=587
    SMTP_USER=your-email@gmail.com
-   SMTP_PASS=your-app-password
+   SMTP_PASS=your-gmail-app-password
    ```
 
-   **For Gmail:**
-   - Enable 2-factor authentication
-   - Generate an "App Password" from your Google Account settings
-   - Use the app password (not your regular password) in `SMTP_PASS`
+   **Gmail Setup Steps:**
+   
+   1. **Enable 2-Factor Authentication:**
+      - Go to your Google Account: https://myaccount.google.com/
+      - Navigate to **Security** → **2-Step Verification**
+      - Enable 2-Step Verification if not already enabled
+   
+   2. **Generate App Password:**
+      - Go to: https://myaccount.google.com/apppasswords
+      - Or: Google Account → Security → 2-Step Verification → App passwords
+      - Select "Mail" and "Other (Custom name)"
+      - Enter a name like "Match Attendance App"
+      - Click "Generate"
+      - Copy the 16-character password (no spaces)
+   
+   3. **Use the App Password:**
+      - In your `.env` file, set `SMTP_PASS` to the generated app password
+      - **Important:** Use the App Password, NOT your regular Gmail password
+      - The app password will look like: `abcd efgh ijkl mnop` (remove spaces: `abcdefghijklmnop`)
+
+   **Example .env file for Gmail:**
+   ```env
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=yourname@gmail.com
+   SMTP_PASS=abcdefghijklmnop
+   ```
 
    **For other email providers:**
    - Update `SMTP_HOST` and `SMTP_PORT` accordingly
    - Use your email credentials
-
-   **Alternative:** Edit `emailService.js` directly and update the `emailConfig` object.
 
 3. **Configure admin credentials:**
 
