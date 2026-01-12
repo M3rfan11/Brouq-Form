@@ -26,12 +26,14 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 // Session configuration
+// Use MemoryStore for Railway (simple, no external dependencies)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'match-attendance-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: 'auto', // Automatically set based on connection
+    secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
+    httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
