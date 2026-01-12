@@ -3,21 +3,34 @@ const nodemailer = require('nodemailer');
 // Email configuration
 // Configure via .env file or GitHub Secrets
 // For Gmail: Use App Password (not regular password)
+// Determine if we should use secure connection (port 465 = SSL)
+const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
+const useSecure = smtpPort === 465;
+
 const emailConfig = {
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT) || 587,
-  secure: false, // true for 465, false for 587 (Gmail uses 587)
+  port: smtpPort,
+  secure: useSecure, // true for 465 (SSL), false for 587 (TLS)
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || ''
   },
-  // Add connection timeout settings for cloud platforms
+  // Connection timeout settings optimized for Railway
   connectionTimeout: 10000, // 10 seconds
   greetingTimeout: 10000,
   socketTimeout: 10000,
+  // Retry configuration
+  pool: true, // Use connection pooling
+  maxConnections: 1,
+  maxMessages: 3,
   // Enable debug in development
   debug: process.env.NODE_ENV !== 'production',
-  logger: process.env.NODE_ENV !== 'production'
+  logger: process.env.NODE_ENV !== 'production',
+  // TLS options for better compatibility with Railway
+  tls: {
+    rejectUnauthorized: false, // Allow self-signed certificates if needed
+    minVersion: 'TLSv1.2'
+  }
 };
 
 // Create transporter
