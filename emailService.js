@@ -85,7 +85,7 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
       // For SendGrid, use the verified sender email (must be verified in SendGrid)
       // For Gmail, use the auth user
       const fromEmail = emailConfig.host === 'smtp.sendgrid.net' 
-        ? (process.env.SENDER_EMAIL || 'merfan3746@gmail.com') // Use verified email, NOT "apikey"
+        ? (process.env.SENDER_EMAIL || 'm.elshabouri@gmail.com') // Use verified email, NOT "apikey"
         : emailConfig.auth.user;
       
       if (emailConfig.host === 'smtp.sendgrid.net' && fromEmail === 'apikey') {
