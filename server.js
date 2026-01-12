@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const session = require('express-session');
+const jwt = require('jsonwebtoken');
 const { dbHelpers } = require('./database');
 // Use SendGrid REST API if SMTP_HOST is sendgrid (more reliable than SMTP)
 let sendEmailWithQR;

@@ -49,17 +49,20 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ username, password }),
-            credentials: 'include' // Important for sessions
+            credentials: 'include' // Important for cookies
         });
         
         const data = await response.json();
         
         if (response.ok) {
-            // Success - wait a bit to ensure cookie is set, then redirect
+            // Store JWT token in localStorage as backup
+            if (data.token) {
+                localStorage.setItem('authToken', data.token);
+            }
+            
+            // Success - redirect immediately (cookie is set by server)
             const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || 'admin.html';
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 100); // Small delay to ensure cookie is set
+            window.location.href = redirectUrl;
         } else {
             // Error
             messageDiv.className = 'message error';

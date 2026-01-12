@@ -4,18 +4,30 @@ let html5QrcodeScanner = null;
 // Check authentication
 async function checkAuth() {
     try {
+        // Get token from localStorage as backup
+        const token = localStorage.getItem('authToken');
+        
+        const headers = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const response = await fetch(`${API_BASE_URL}/api/auth/status`, {
-            credentials: 'include'
+            credentials: 'include',
+            headers: headers
         });
         const data = await response.json();
         
         if (!data.authenticated) {
+            // Clear invalid token
+            localStorage.removeItem('authToken');
             window.location.href = `login.html?redirect=${encodeURIComponent('scanner.html')}`;
             return false;
         }
         return true;
     } catch (error) {
         console.error('Error checking auth:', error);
+        localStorage.removeItem('authToken');
         window.location.href = `login.html?redirect=${encodeURIComponent('scanner.html')}`;
         return false;
     }
