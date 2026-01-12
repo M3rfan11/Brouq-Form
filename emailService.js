@@ -157,13 +157,21 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
       ]
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.messageId);
-    return info;
-  } catch (error) {
-    console.error('Error sending email:', error);
-    throw error;
-  }
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent:', info.messageId);
+      return info;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw error;
+    }
+  })();
+
+  // Add 15 second timeout to prevent hanging connections
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Email sending timeout after 15 seconds')), 15000);
+  });
+
+  return Promise.race([emailPromise, timeoutPromise]);
 }
 
 // Verify email configuration (only in development, skip in production to avoid startup delays)
