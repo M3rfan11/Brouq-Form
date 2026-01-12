@@ -152,13 +152,31 @@ app.post('/api/login', (req, res) => {
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     req.session.authenticated = true;
     req.session.username = username;
-    // Save session explicitly
+    
+    // Log session info for debugging
+    console.log('Login successful, setting session:', {
+      sessionId: req.sessionID,
+      authenticated: req.session.authenticated,
+      username: req.session.username
+    });
+    
+    // Save session explicitly and set cookie headers
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
         return res.status(500).json({ error: 'Failed to save session' });
       }
-      res.json({ success: true, message: 'Login successful' });
+      
+      // Ensure cookie is set
+      res.cookie('match-attendance.sid', req.sessionID, {
+        secure: true,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: 'lax'
+      });
+      
+      console.log('Session saved, cookie set:', req.sessionID);
+      res.json({ success: true, message: 'Login successful', sessionId: req.sessionID });
     });
   } else {
     res.status(401).json({ error: 'Invalid username or password' });
@@ -182,10 +200,19 @@ app.get('/api/auth/status', (req, res) => {
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   
+  // Log session info for debugging
+  console.log('Auth status check:', {
+    sessionId: req.sessionID,
+    hasSession: !!req.session,
+    authenticated: req.session && req.session.authenticated,
+    cookies: req.headers.cookie
+  });
+  
   const isAuthenticated = req.session && req.session.authenticated === true;
   res.json({ 
     authenticated: isAuthenticated,
-    username: isAuthenticated ? req.session.username : null
+    username: isAuthenticated ? req.session.username : null,
+    sessionId: req.sessionID
   });
 });
 
