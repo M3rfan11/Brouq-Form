@@ -176,6 +176,13 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
               </div>
             </div>
 
+            <div style="background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <strong style="color: #1976D2; font-size: 16px;">📍 Venue Location:</strong>
+              <p style="margin: 10px 0 0 0; font-size: 15px; color: #333;">
+                <strong>Brouq's land beside Patio 7, AUC Avenue road</strong>
+              </p>
+            </div>
+
             <div class="instructions">
               <strong>Important Instructions:</strong>
               <ul>

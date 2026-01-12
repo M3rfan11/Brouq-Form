@@ -43,6 +43,8 @@ Thank you for registering for the match! Your attendance has been confirmed.
 
 Your QR Code: ${qrCode}
 
+📍 Venue Location: Brouq's land beside Patio 7, AUC Avenue road
+
 Please present this QR code at the venue entrance. You can scan the QR code image in this email OR copy the code above for manual entry.
 
 Important Instructions:
@@ -146,6 +148,13 @@ This is an automated message. Please do not reply to this email.`,
                   Copy this code and paste it in the manual entry field if needed
                 </p>
               </div>
+            </div>
+
+            <div style="background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <strong style="color: #1976D2; font-size: 16px;">📍 Venue Location:</strong>
+              <p style="margin: 10px 0 0 0; font-size: 15px; color: #333;">
+                <strong>Brouq's land beside Patio 7, AUC Avenue road</strong>
+              </p>
             </div>
 
             <div class="instructions">
