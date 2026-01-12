@@ -5,12 +5,19 @@ const nodemailer = require('nodemailer');
 // For Gmail: Use App Password (not regular password)
 const emailConfig = {
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
+  port: parseInt(process.env.SMTP_PORT) || 587,
   secure: false, // true for 465, false for 587 (Gmail uses 587)
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || ''
-  }
+  },
+  // Add connection timeout settings for cloud platforms
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
+  // Enable debug in development
+  debug: process.env.NODE_ENV !== 'production',
+  logger: process.env.NODE_ENV !== 'production'
 };
 
 // Create transporter
