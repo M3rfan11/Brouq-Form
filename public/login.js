@@ -55,9 +55,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (response.ok) {
-            // Success - redirect
+            // Success - wait a bit to ensure cookie is set, then redirect
             const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || 'admin.html';
-            window.location.href = redirectUrl;
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 100); // Small delay to ensure cookie is set
         } else {
             // Error
             messageDiv.className = 'message error';

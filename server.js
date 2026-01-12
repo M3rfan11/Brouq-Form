@@ -72,9 +72,16 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Authentication middleware
 const requireAuth = (req, res, next) => {
-  if (req.session && req.session.authenticated) {
+  console.log('requireAuth check:', {
+    sessionId: req.sessionID,
+    hasSession: !!req.session,
+    authenticated: req.session && req.session.authenticated
+  });
+  
+  if (req.session && req.session.authenticated === true) {
     return next();
   } else {
+    console.log('Auth failed, returning 401');
     return res.status(401).json({ error: 'Authentication required' });
   }
 };
