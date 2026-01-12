@@ -16,9 +16,10 @@ const emailConfig = {
     pass: process.env.SMTP_PASS || ''
   },
   // Connection timeout settings optimized for Railway
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
+  // Increased timeouts for Gmail on cloud platforms
+  connectionTimeout: 20000, // 20 seconds (increased for Gmail)
+  greetingTimeout: 20000,
+  socketTimeout: 30000, // 30 seconds for socket operations
   // Retry configuration
   pool: true, // Use connection pooling
   maxConnections: 1,
