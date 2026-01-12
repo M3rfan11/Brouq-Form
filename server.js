@@ -212,6 +212,10 @@ app.post('/api/login', (req, res) => {
 
 // Logout endpoint
 app.post('/api/logout', (req, res) => {
+  // Clear JWT cookie
+  res.clearCookie('authToken');
+  
+  // Destroy session
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).json({ error: 'Failed to logout' });
