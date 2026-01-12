@@ -17,7 +17,9 @@ COPY . .
 RUN mkdir -p /app/data
 
 # Expose port (Cloud Run sets PORT automatically)
-EXPOSE 3000
+# Cloud Run sets PORT automatically
+ENV PORT=8080
+EXPOSE 8080
 
 # Start the application
 CMD ["node", "server.js"]

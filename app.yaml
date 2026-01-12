@@ -1,0 +1,29 @@
+runtime: nodejs20
+
+env: standard
+
+instance_class: F1
+
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+  target_cpu_utilization: 0.6
+  target_throughput_utilization: 0.6
+
+env_variables:
+  NODE_ENV: production
+  # These will be set in Google Cloud Console or via gcloud
+  # ADMIN_USERNAME: admin
+  # ADMIN_PASSWORD: your-secure-password
+  # SESSION_SECRET: your-session-secret
+  # SMTP_HOST: smtp.gmail.com
+  # SMTP_PORT: 587
+  # SMTP_USER: merfan3746@gmail.com
+  # SMTP_PASS: your-gmail-app-password
+  # SENDER_EMAIL: merfan3746@gmail.com
+  # QR_EXPIRY_DAYS: 7
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
