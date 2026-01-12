@@ -165,6 +165,9 @@ if (process.env.NODE_ENV !== 'production') {
 } else {
   // In production, skip verification to avoid startup timeout
   console.log('📧 Email service configured (will verify on first send)');
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log('⚠️  Warning: SMTP credentials not set in environment variables');
+  }
 }
 
 module.exports = { sendEmailWithQR, transporter };
