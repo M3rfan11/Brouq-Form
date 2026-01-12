@@ -213,15 +213,26 @@ app.get('/api/auth/status', (req, res) => {
   console.log('Auth status check:', {
     sessionId: req.sessionID,
     hasSession: !!req.session,
+    sessionKeys: req.session ? Object.keys(req.session) : [],
     authenticated: req.session && req.session.authenticated,
-    cookies: req.headers.cookie
+    authenticatedValue: req.session ? req.session.authenticated : 'no session',
+    cookies: req.headers.cookie,
+    sessionStore: 'MemoryStore'
   });
   
+  // Check if session exists and has authenticated property
   const isAuthenticated = req.session && req.session.authenticated === true;
+  
+  // If session exists but authenticated is not set, log warning
+  if (req.session && req.session.authenticated !== true && req.session.authenticated !== false) {
+    console.warn('Session exists but authenticated property is:', req.session.authenticated);
+  }
+  
   res.json({ 
     authenticated: isAuthenticated,
     username: isAuthenticated ? req.session.username : null,
-    sessionId: req.sessionID
+    sessionId: req.sessionID,
+    sessionKeys: req.session ? Object.keys(req.session) : []
   });
 });
 
