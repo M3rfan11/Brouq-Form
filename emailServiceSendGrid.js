@@ -35,7 +35,7 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
         name: 'Match Attendance'
       },
       replyTo: fromEmail, // Add reply-to for better deliverability
-      subject: 'Your Match Attendance QR Code - Please Confirm',
+      subject: 'Match Attendance Confirmation - Your QR Code',
       // Add plain text version for better deliverability
       text: `Hello ${name},
 
