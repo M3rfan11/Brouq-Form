@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: brouq-match-form
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    # Add your environment variables in Render dashboard:
+    # ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, etc.

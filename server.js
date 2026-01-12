@@ -348,22 +348,30 @@ try {
   console.log('Could not load SSL certificates:', error.message);
 }
 
-// Start HTTP server (for localhost)
+// Start HTTP server
+// In production (cloud platforms), use PORT from environment
+// In local development, use PORT 3000
 const httpServer = http.createServer(app);
-httpServer.listen(PORT, () => {
-  console.log(`HTTP Server running on http://localhost:${PORT}`);
-  console.log(`Access from same device: http://localhost:${PORT}`);
+const serverPort = process.env.PORT || PORT;
+httpServer.listen(serverPort, () => {
+  console.log(`Server running on port ${serverPort}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`HTTP Server: http://localhost:${serverPort}`);
+    console.log(`Access from same device: http://localhost:${serverPort}`);
+  }
 });
 
-// Start HTTPS server (for mobile access)
-if (httpsOptions) {
+// Start HTTPS server (for mobile access in local development)
+// In production, cloud platforms provide HTTPS automatically
+if (httpsOptions && process.env.NODE_ENV !== 'production') {
   const httpsServer = https.createServer(httpsOptions, app);
   httpsServer.listen(HTTPS_PORT, () => {
     console.log(`HTTPS Server running on https://localhost:${HTTPS_PORT}`);
-    console.log(`Access from mobile: https://192.168.1.53:${HTTPS_PORT}`);
+    console.log(`Access from mobile: https://YOUR_IP:${HTTPS_PORT}`);
     console.log(`⚠️  You'll need to accept the security warning (self-signed certificate)`);
   });
-} else {
+} else if (process.env.NODE_ENV !== 'production') {
   console.log('⚠️  HTTPS not available - camera will not work on iOS Safari via IP address');
   console.log('   Camera requires HTTPS when accessing via IP (not localhost)');
+  console.log('   In production, your platform will provide HTTPS automatically');
 }
