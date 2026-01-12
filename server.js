@@ -41,6 +41,9 @@ if (!process.env.NODE_ENV) {
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
+// JWT secret for token-based auth (works better on Cloud Run than sessions)
+const JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'match-attendance-jwt-secret-change-in-production';
+
 // Session configuration
 // Use MemoryStore for Railway (simple, no external dependencies)
 // Session configuration optimized for Cloud Run
