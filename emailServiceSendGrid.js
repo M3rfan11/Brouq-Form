@@ -145,7 +145,7 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
           filename: 'qr-code.png',
           type: 'image/png',
           disposition: 'inline', // Changed to inline so it displays in email
-          contentId: 'qrcode' // Content-ID for embedding in HTML (cid:qrcode)
+          content_id: 'qrcode' // Content-ID for embedding in HTML (cid:qrcode) - SendGrid uses snake_case
         }
       ]
     };
