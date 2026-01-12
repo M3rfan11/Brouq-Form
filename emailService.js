@@ -52,11 +52,11 @@ console.log(`   Connection Timeout: ${emailConfig.connectionTimeout}ms`);
 if (emailConfig.host === 'smtp.sendgrid.net') {
   console.log(`   Provider: SendGrid`);
   // For SendGrid, sender email must be verified email, not "apikey"
-  const senderEmail = process.env.SENDER_EMAIL || 'm.elshabouri@gmail.com';
-  console.log(`   Sender Email: ${senderEmail} (verified)`);
+  const senderEmail = process.env.SENDER_EMAIL || 'merfan3746@gmail.com';
+  console.log(`   Sender Email: ${senderEmail} (must be verified in SendGrid)`);
   if (!process.env.SENDER_EMAIL) {
-    console.log(`   ⚠️  SENDER_EMAIL not set, using default: m.elshabouri@gmail.com`);
-    console.log(`   💡 Add SENDER_EMAIL=m.elshabouri@gmail.com to Railway variables (optional)`);
+    console.log(`   ⚠️  SENDER_EMAIL not set, using default: merfan3746@gmail.com`);
+    console.log(`   💡 Add SENDER_EMAIL=merfan3746@gmail.com to Railway variables (optional)`);
   }
 } else {
   console.log(`   Provider: Gmail`);
@@ -85,12 +85,12 @@ async function sendEmailWithQR(to, name, qrCodeBuffer, qrCode, expiresAt) {
       // For SendGrid, use the verified sender email (must be verified in SendGrid)
       // For Gmail, use the auth user
       const fromEmail = emailConfig.host === 'smtp.sendgrid.net' 
-        ? (process.env.SENDER_EMAIL || 'm.elshabouri@gmail.com') // Use verified email, NOT "apikey"
+        ? (process.env.SENDER_EMAIL || 'merfan3746@gmail.com') // Use verified email, NOT "apikey"
         : emailConfig.auth.user;
       
       if (emailConfig.host === 'smtp.sendgrid.net' && fromEmail === 'apikey') {
         console.error('   ❌ ERROR: Sender email cannot be "apikey" for SendGrid!');
-        console.error('   💡 Set SENDER_EMAIL=m.elshabouri@gmail.com in Railway variables');
+        console.error('   💡 Set SENDER_EMAIL=merfan3746@gmail.com in Railway variables');
         throw new Error('Invalid sender email for SendGrid. Set SENDER_EMAIL environment variable to your verified email.');
       }
       
