@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>QR Code Scanner - Match Attendance</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        // Debug: Log when library loads
+        window.addEventListener('load', () => {
+            console.log('HTML5-QRCode library loaded:', typeof Html5Qrcode !== 'undefined' ? 'YES' : 'NO');
+        });
+    </script>
+</head>
+<body>
+    <div class="scanner-page">
+        <div class="scanner-header">
+            <h1>QR Code Scanner</h1>
+            <button id="logoutBtn" class="logout-btn-small">🚪 Logout</button>
+        </div>
+
+        <div class="scanner-container-mobile">
+            <div id="loadingMessage" class="loading-message" style="display: none;">
+                <p>Loading camera...</p>
+            </div>
+            <div id="reader" class="qr-reader-mobile"></div>
+            <div class="scanner-overlay" id="scannerOverlay" style="display: none;">
+                <div class="scan-frame"></div>
+                <p class="scan-hint">Point camera at QR code</p>
+            </div>
+        </div>
+
+        <div class="scanner-controls">
+            <button id="startCameraBtn" class="toggle-btn" style="display: none;">📷 Start Camera</button>
+            <button id="toggleManualBtn" class="toggle-btn" style="background: #28a745;">📝 Manual Entry</button>
+            <div id="statusMessage" style="color: white; text-align: center; padding: 10px; font-size: 0.9em;"></div>
+        </div>
+
+        <div id="manualEntry" class="manual-entry" style="display: none;">
+            <input type="text" id="manualQR" placeholder="Enter QR code manually" class="qr-input-mobile">
+            <button id="verifyBtn" class="verify-btn-mobile">Verify QR Code</button>
+        </div>
+
+        <div id="result" class="result-container-mobile" style="display: none;">
+            <div class="result-content">
+                <div id="resultIcon" class="result-icon"></div>
+                <h2 id="resultTitle"></h2>
+                <p id="resultMessage"></p>
+                <div id="resultDetails" class="result-details"></div>
+                <button id="scanAgainBtn" class="scan-again-btn-mobile">Scan Another</button>
+            </div>
+        </div>
+
+        <div id="cameraError" class="camera-error" style="display: none;">
+            <p><strong>Camera Access Required</strong></p>
+            <p id="errorMessage">Camera access is required to scan QR codes.</p>
+            <div class="camera-help">
+                <p><strong>Tips:</strong></p>
+                <ul>
+                    <li>Allow camera permissions when prompted</li>
+                    <li>Make sure you're using Safari (not Chrome on iOS)</li>
+                    <li>Try refreshing the page</li>
+                    <li>Check Safari Settings → Camera permissions</li>
+                </ul>
+            </div>
+            <button id="retryCameraBtn" class="retry-btn">Retry Camera</button>
+            <button id="useManualBtn" class="retry-btn" style="background: #667eea; margin-top: 10px;">Use Manual Entry Instead</button>
+        </div>
+    </div>
+
+    <script src="scanner.js"></script>
+</body>
+</html>

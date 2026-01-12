@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Attendance Registration</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="form-wrapper">
+        <!-- Floating football balls -->
+        <div class="football-decoration">⚽</div>
+        <div class="football-decoration football-2">⚽</div>
+        <div class="football-decoration football-3">⚽</div>
+        
+        <div class="logo-container">
+            <img src="brouq-logo.png" alt="Brouq Developments" class="brand-logo">
+        </div>
+        <div class="header">
+            <h1>⚽ Match Attendance Registration</h1>
+            <p>Fill out the form below to receive your QR code via email</p>
+        </div>
+
+        <form id="attendanceForm" class="attendance-form" novalidate>
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                <span class="error-message" id="nameError"></span>
+                <span class="field-hint">Must be at least 3 characters, letters and spaces only</span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                <span class="error-message" id="emailError"></span>
+                <span class="field-hint">Enter a valid email address (e.g., name@example.com)</span>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="01012345678 or +201012345678">
+                <span class="error-message" id="phoneError"></span>
+                <span class="field-hint">Optional: Egyptian format (10 or 11 digits, e.g., 01012345678)</span>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span class="btn-text">Submit Registration</span>
+                <span class="btn-loader" style="display: none;">⏳</span>
+            </button>
+        </form>
+
+        <div id="message" class="message" style="display: none;"></div>
+    </div>
+
+    <script src="form.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Admin Dashboard - Match Attendance</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="admin-wrapper">
+            <div class="header">
+                <h1>Admin Dashboard</h1>
+                <p>View attendance statistics and manage registrations</p>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAttendees">0</div>
+                    <div class="stat-label">Total Registrations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="usedCodes">0</div>
+                    <div class="stat-label">QR Codes Used</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="unusedCodes">0</div>
+                    <div class="stat-label">QR Codes Unused</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="refreshBtn" class="refresh-btn">🔄 Refresh Data</button>
+                <button id="logoutBtn" class="logout-btn">🚪 Logout</button>
+            </div>
+
+            <div class="attendees-table-container">
+                <h2>All Attendees</h2>
+                <table class="attendees-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th>Expires At</th>
+                            <th>Used At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendeesTableBody">
+                        <tr>
+                            <td colspan="7" class="loading">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="index.html" class="link-btn">📝 Registration Form</a>
+            <a href="scanner.html" class="link-btn">🔍 QR Code Scanner</a>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
